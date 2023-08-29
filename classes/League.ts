@@ -2,7 +2,16 @@ import csv from "csv-parser"
 import fs from "fs"
 const createCsvWriter = require("csv-writer").createObjectCsvWriter
 import _ from "lodash"
-
+import { readFile } from "fs/promises"
+const addComputedFields = (pick: any) => {
+  let computedPick = {
+    ...pick,
+    full_name: `${pick.first_name} ${pick.last_name}`,
+    keeper_cost: +pick.amount + 3,
+    // points_2022: 10,
+  }
+  return computedPick
+}
 export default class League {
   public league_id: string
   public league_year: number
@@ -10,6 +19,9 @@ export default class League {
   private picksFileName = "picks"
   private _apiBase = "https://api.sleeper.app/v1"
   private _scoringSettings?: ScoringSettings
+  private _league: null | {} = null
+  private _rosters: null | any[] = null
+  private _playerRef: null | Record<string, any> = null
   initialized = false
   constructor({
     input_league_id,
@@ -31,6 +43,7 @@ export default class League {
       console.info(`League ${this.league_id} Already initialized`)
       return true
     }
+    this._playerRef = JSON.parse(await readFile("data/player-ref.json", "utf8"))
     let api_base = this._apiBase
     if (this.league_year && !this.league_id) {
       const leaguesResponse = await fetch(
@@ -41,6 +54,7 @@ export default class League {
         // assumes only one league
         this.league_id = leagues[0].league_id
         this._scoringSettings = leagues[0].scoring_settings
+        this._league = leagues[0]
       } else {
         throw leaguesResponse.statusText
       }
@@ -55,10 +69,43 @@ export default class League {
         this.league_year = league.season
       }
       this._scoringSettings = league["scoring_settings"]
+      this._league = league
     }
     this.initialized = true
   }
-  private getRosters = async () => {}
+  private fetchRosters = async () => {
+    const rosterRes = await fetch(
+      `${this._apiBase}/league/${this.league_id}/rosters`
+    )
+    if (!rosterRes.ok) {
+      throw `No rosters for league ${this.league_id} year ${this.league_year}`
+    }
+    let rosters = await rosterRes.json()
+    const usersRes = await Promise.all(
+      rosters.map((r: any) => {
+        let owner = r.owner_id
+        return fetch(`${this._apiBase}/user/${owner}`)
+      })
+    )
+    const users = await Promise.all(
+      usersRes.filter((res) => res.ok).map((res) => res.json())
+    )
+    const userMap = _.keyBy(users, "user_id")
+    rosters = rosters.map((r: any) => {
+      let owner = r.owner_id
+      let user = userMap[r.owner_id]
+      return { ...r, username: user.username }
+    })
+    this._rosters = rosters
+    return rosters
+  }
+  private getRosters = async (): Promise<any[]> => {
+    if (this._rosters === null) {
+      await this.fetchRosters()
+    }
+    //@ts-ignore
+    return this._rosters
+  }
   private round = (value: number, precision: number) => {
     var multiplier = Math.pow(10, precision || 0)
     return Math.round(value * multiplier) / multiplier
@@ -202,17 +249,7 @@ export default class League {
     })
   }
 
-  private addComputedFields = (pick: any) => {
-    let computedPick = {
-      ...pick,
-      full_name: `${pick.first_name} ${pick.last_name}`,
-      keeper_cost: +pick.amount + 3,
-      // points_2022: 10,
-    }
-    return computedPick
-  }
-
-  private getPicksData = async (): Promise<any[]> => {
+  getPicksData = async (): Promise<any[]> => {
     const readPicksProm: Promise<any[]> = new Promise((resolve, reject) => {
       let data: any[] = []
       if (fs.existsSync(`${this.picksFileName}_${this.league_year}.csv`)) {
@@ -277,7 +314,6 @@ export default class League {
       let headers: { id: string; title: string }[] = Object.entries(fieldMap)
         .map(([title, id]) => ({ id: title, title: title.toLocaleUpperCase() }))
         .concat(customHeaders)
-      let that = this
       let massagedPicks = _.chain(picks)
         .map(function (pick) {
           let pickedObj = _.pick(pick, Object.values(fieldMap))
@@ -286,7 +322,7 @@ export default class League {
             pickedObj[key] = value
           }
           delete pickedObj.metadata
-          let finishedObj = that.addComputedFields(pickedObj)
+          let finishedObj = addComputedFields(pickedObj)
           return finishedObj
         })
         .value()
@@ -365,5 +401,41 @@ export default class League {
     })
     csvWriter.writeRecords(combinedData)
     console.log("done")
+  }
+  downloadKeeperData = async () => {
+    let keepers = await this.getKeepers()
+    console.log(keepers)
+  }
+  private addPlayerData = async (ids: any[]): Promise<any[]> => {
+    let playerRef = this._playerRef
+    return ids.map((id) => {
+      //@ts-ignore
+      let ref = playerRef[id]
+      if (ref) {
+        return ref
+      } else {
+        return []
+      }
+    })
+  }
+  getKeepers = async () => {
+    const rosters = await this.getRosters()
+    let keeperMap: Record<number, any> = {}
+    let keeperList: any[] = []
+
+    for (let index = 0; index < rosters.length; index++) {
+      const roster = rosters[index]
+      let keepers: any[] = roster.keepers
+      let filledKeepers = await this.addPlayerData(keepers)
+      keeperMap[roster.username] = filledKeepers
+      keeperList = keeperList.concat(
+        filledKeepers.map((k) => {
+          k.username = roster.username
+          return k
+        })
+      )
+    }
+    return keeperList
+    // return keeperMap
   }
 }
