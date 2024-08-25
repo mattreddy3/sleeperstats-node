@@ -7,7 +7,7 @@ const addComputedFields = (pick: any) => {
   let computedPick = {
     ...pick,
     full_name: `${pick.first_name} ${pick.last_name}`,
-    keeper_cost: +pick.amount + 3,
+    // keeper_cost: +pick.amount + 3,
     // points_2022: 10,
   }
   return computedPick
@@ -309,7 +309,7 @@ export default class League {
       let customHeaders = [
         { id: "full_name", title: "FULL_NAME" },
         { id: "keeper_cost", title: "KEEPER_COST" },
-        { id: "points_2022", title: "POINTS_2022" },
+        // { id: "points_2022", title: "POINTS_2022" },
       ]
       let headers: { id: string; title: string }[] = Object.entries(fieldMap)
         .map(([title, id]) => ({ id: title, title: title.toLocaleUpperCase() }))
@@ -323,6 +323,7 @@ export default class League {
           }
           delete pickedObj.metadata
           let finishedObj = addComputedFields(pickedObj)
+
           return finishedObj
         })
         .value()
@@ -402,30 +403,69 @@ export default class League {
     csvWriter.writeRecords(combinedData)
     console.log("done")
   }
-  downloadKeeperData = async () => {
-    let keepers = await this.getKeepers()
+  downloadKeeperData = async (ops: { preseason?: boolean }) => {
+    let keepers = await this.getKeepers(ops)
     console.log(keepers)
   }
   private addPlayerData = async (ids: any[]): Promise<any[]> => {
     let playerRef = this._playerRef
-    return ids.map((id) => {
-      //@ts-ignore
-      let ref = playerRef[id]
-      if (ref) {
-        return ref
-      } else {
-        return []
-      }
-    })
+    let that = this
+    return Promise.all(
+      ids.map(async (id) => {
+        //@ts-ignore
+        let ref = playerRef[id]
+        if (ref) {
+          let transactionHistory = await that._getPlayerTransactionHistory(id)
+          if (transactionHistory.find((t: any) => !t.pre_trade_deadline)) {
+            return []
+          }
+          // if a transaction exists past trade deadline - not a keeper
+          return ref
+        } else {
+          return []
+        }
+      })
+    )
   }
-  getKeepers = async () => {
+  /**
+   *
+   * This feature gets keepers or list of players eligible to be kept
+   * For "pre-season" list of eligible keepers, use {preseason:true}
+   * @param {preseason:boolean, postseason:boolean} `preseason` flag to get list of eligible keepers. `postseason` flag to get final keepers. Default `false` for both
+   * @returns list of keepers
+   */
+  getKeepers = async ({
+    preseason = false,
+    postseason = false,
+  }: {
+    preseason?: boolean
+    postseason?: boolean
+  }): Promise<any[]> => {
     const rosters = await this.getRosters()
     let keeperMap: Record<number, any> = {}
     let keeperList: any[] = []
-
+    // For postseason, just get the final csv from the dataset
+    if (postseason) {
+      return new Promise((resolve, reject) => {
+        let data: any[] = []
+        fs.createReadStream(`data/keepers_final_${this.league_year}.csv`)
+          .pipe(csv())
+          .on("data", (row: any) => {
+            // console.log(row)
+            data.push(row)
+          })
+          .on("end", () => {
+            console.log(`${this.league_year} keepers done`)
+            resolve(data)
+          })
+          .on("error", (err: any) => {
+            reject(err)
+          })
+      })
+    }
     for (let index = 0; index < rosters.length; index++) {
       const roster = rosters[index]
-      let keepers: any[] = roster.keepers
+      let keepers: any[] = preseason ? roster.players : roster.keepers
       let filledKeepers = await this.addPlayerData(keepers)
       keeperMap[roster.username] = filledKeepers
       keeperList = keeperList.concat(
@@ -437,5 +477,77 @@ export default class League {
     }
     return keeperList
     // return keeperMap
+  }
+
+  private _getPlayerTransactionQuery = (player_id: string) => {
+    return {
+      operationName: "league_transactions_by_player",
+      variables: {},
+      query: `query league_transactions_by_player {
+      league_transactions_by_player(league_id: "${this.league_id}", player_id: "${player_id}") {
+        adds
+        consenter_ids
+        created
+        creator
+        drops
+        league_id
+        leg
+        metadata
+        roster_ids
+        settings
+        status
+        status_updated
+        transaction_id
+        draft_picks
+        type
+        player_map
+        waiver_budget
+      }
+    }`,
+    }
+  }
+  private _getPlayerTransactionHistory = async (player_id: string) => {
+    let res = await fetch("https://sleeper.com/graphql", {
+      headers: {
+        accept: "application/json",
+        "accept-language":
+          "en,en-US;q=0.9,ca;q=0.8,de;q=0.7,fr;q=0.6,nl;q=0.5,es;q=0.4",
+        authorization:
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdmF0YXIiOiI4MmFlYzhlODExYjgzOWI4ZWMyNWQ3YjQ1OGFmZDU3YiIsImRpc3BsYXlfbmFtZSI6Im1yZWRkeSIsImV4cCI6MTc1NjAyMDExNSwiaXNfYm90IjpudWxsLCJpc19tYXN0ZXIiOm51bGwsInJlYWxfbmFtZSI6bnVsbCwidXNlcl9pZCI6ODU0OTc4NDM2Njg5NzAyOTEyfQ.f14miEoyDGJZdG4gvPpk8XU6tgWGpTZkOUUTywTYijM",
+        "content-type": "application/json",
+        priority: "u=1, i",
+        "sec-ch-ua":
+          '"Chromium";v="128", "Not;A=Brand";v="24", "Google Chrome";v="128"',
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"macOS"',
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-origin",
+        "sec-gpc": "1",
+        "x-sleeper-graphql-op": "league_transactions_by_player",
+        cookie:
+          "__spdt=19caecc06cb84947925de63aaacab096; intercom-id-xstxtwfr=d92b1228-1ceb-4c58-a263-ef4780fc7bf5; intercom-device-id-xstxtwfr=264b9045-099c-46ba-8d36-03e356f4609b; OptanonAlertBoxClosed=2024-08-24T07:21:58.620Z; _ga=GA1.1.710020635.1724511692; _ga_D47X7ML72N=GS1.1.1724511692.1.1.1724511749.3.0.0; OptanonConsent=isGpcEnabled=1&datestamp=Sun+Aug+25+2024+11%3A54%3A29+GMT%2B0200+(Central+European+Summer+Time)&version=202404.1.0&browserGpcFlag=1&isIABGlobal=false&hosts=&landingPath=NotLandingPage&groups=C0003%3A0%2CC0001%3A1%2CC0002%3A0%2CC0004%3A0&geolocation=ES%3BMD&AwaitingReconsent=false; intercom-session-xstxtwfr=TEc3TFcrVDZsZXVSUWNXQUROSVY2YW0yN1hQZ3RkSllNb0g3alh0VUxBMVpYd3MzOHUwTjZQN1FWREgzNUNWeS0tWkNGc2VUMmNiUFY3RFQ2WlI0S2tyUT09--1ba80f1f7f64bc0ea22267a8a6c5b7ae4a55e974",
+        Referer: "https://sleeper.com/leagues/1124814687217676288/predraft",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+      },
+      body: JSON.stringify(this._getPlayerTransactionQuery(player_id)),
+      method: "POST",
+    })
+    if (res.ok) {
+      let data = await res.json()
+      let returnData = data.data.league_transactions_by_player.map((t: any) => {
+        return {
+          amount: _.get(t, "metadata.amount"), // 0 unless draft
+          trans_type: _.get(t, "type"),
+          timestamp: _.get(t, "status_updated"),
+          pre_trade_deadline:
+            new Date(_.get(t, "status_updated")) <
+            new Date("2023-11-21T00:00:00.000Z"),
+          action:
+            _.get(t, "adds") && _.get(t, `adds.${player_id}`) ? "add" : "drop",
+        }
+      })
+      return returnData
+    }
   }
 }

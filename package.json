@@ -24,6 +24,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
+    "@linear/sdk": "^8.0.0",
     "csv-parser": "^3.0.0",
     "csv-writer": "^1.6.0",
     "lodash": "^4.17.21"
