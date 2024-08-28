@@ -1,0 +1,482 @@
+[
+  {
+    "status": "complete",
+    "created": "Aug 29, 2023",
+    "adds": null,
+    "drops": ["Tom Brady"],
+    "roster_ids": [1],
+    "status_updated": "Aug 29, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": null,
+    "drops": ["Chase Brown"],
+    "roster_ids": [3],
+    "status_updated": "Aug 30, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": null,
+    "drops": ["Brandon Peters"],
+    "roster_ids": [3],
+    "status_updated": "Aug 30, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": null,
+    "drops": ["Zonovan Knight"],
+    "roster_ids": [4],
+    "status_updated": "Aug 30, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": null,
+    "drops": ["Isaiah Spiller"],
+    "roster_ids": [4],
+    "status_updated": "Aug 30, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": null,
+    "drops": ["Cole Kmet"],
+    "roster_ids": [10],
+    "status_updated": "Aug 30, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": null,
+    "drops": ["John Metchie"],
+    "roster_ids": [3],
+    "status_updated": "Aug 30, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": null,
+    "drops": ["Leonard Fournette"],
+    "roster_ids": [8],
+    "status_updated": "Aug 30, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": null,
+    "drops": ["Gerald Everett"],
+    "roster_ids": [10],
+    "status_updated": "Aug 30, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": null,
+    "drops": ["Easop Winston"],
+    "roster_ids": [1],
+    "status_updated": "Aug 30, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": null,
+    "drops": ["Donovan Peoples-Jones"],
+    "roster_ids": [10],
+    "status_updated": "Aug 30, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": null,
+    "drops": ["Kyle Trask"],
+    "roster_ids": [8],
+    "status_updated": "Aug 30, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": null,
+    "drops": ["Hassan Haskins"],
+    "roster_ids": [1],
+    "status_updated": "Aug 30, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": null,
+    "drops": ["Michael Mayer"],
+    "roster_ids": [8],
+    "status_updated": "Aug 30, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": null,
+    "drops": ["DJ Chark"],
+    "roster_ids": [1],
+    "status_updated": "Aug 30, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": null,
+    "drops": ["Josh Downs"],
+    "roster_ids": [4],
+    "status_updated": "Aug 30, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": null,
+    "drops": ["Marquez Valdes-Scantling"],
+    "roster_ids": [6],
+    "status_updated": "Aug 30, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": null,
+    "drops": ["Jacoby Brissett"],
+    "roster_ids": [6],
+    "status_updated": "Aug 30, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": null,
+    "drops": ["Baker Mayfield"],
+    "roster_ids": [9],
+    "status_updated": "Aug 30, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": null,
+    "drops": ["Devin Singletary"],
+    "roster_ids": [9],
+    "status_updated": "Aug 30, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": null,
+    "drops": ["Joshua Kelley"],
+    "roster_ids": [6],
+    "status_updated": "Aug 30, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": null,
+    "drops": ["Tyjae Spears"],
+    "roster_ids": [5],
+    "status_updated": "Aug 30, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": null,
+    "drops": ["Kenneth Gainwell"],
+    "roster_ids": [5],
+    "status_updated": "Aug 30, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": null,
+    "drops": ["Trey Lance"],
+    "roster_ids": [2],
+    "status_updated": "Aug 30, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": null,
+    "drops": ["Kareem Hunt"],
+    "roster_ids": [2],
+    "status_updated": "Aug 30, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": null,
+    "drops": ["Chigoziem Okonkwo"],
+    "roster_ids": [2],
+    "status_updated": "Aug 30, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": null,
+    "drops": ["DeWayne McBride"],
+    "roster_ids": [12],
+    "status_updated": "Aug 30, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": null,
+    "drops": ["Zach Evans"],
+    "roster_ids": [12],
+    "status_updated": "Aug 30, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": null,
+    "drops": ["Tank Dell"],
+    "roster_ids": [12],
+    "status_updated": "Aug 30, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": null,
+    "drops": ["Clayton Tune"],
+    "roster_ids": [7],
+    "status_updated": "Aug 30, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": null,
+    "drops": ["Rashid Shaheed"],
+    "roster_ids": [7],
+    "status_updated": "Aug 30, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 31, 2023",
+    "adds": null,
+    "drops": ["Tyler Allgeier"],
+    "roster_ids": [11],
+    "status_updated": "Aug 31, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 31, 2023",
+    "adds": null,
+    "drops": ["Will Levis"],
+    "roster_ids": [11],
+    "status_updated": "Aug 31, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 31, 2023",
+    "adds": null,
+    "drops": ["Romeo Doubs"],
+    "roster_ids": [11],
+    "status_updated": "Aug 31, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": ["Kenneth Gainwell"],
+    "drops": ["Ezekiel Elliott"],
+    "roster_ids": [9],
+    "status_updated": "Aug 31, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": ["Deon Jackson"],
+    "drops": ["Clyde Edwards-Helaire"],
+    "roster_ids": [1],
+    "status_updated": "Aug 31, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 30, 2023",
+    "adds": ["Baker Mayfield"],
+    "drops": ["Stetson Bennett"],
+    "roster_ids": [1],
+    "status_updated": "Aug 31, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Sep 01, 2023",
+    "adds": ["Tyler Allgeier"],
+    "drops": ["Sam LaPorta"],
+    "roster_ids": [3],
+    "status_updated": "Sep 02, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 31, 2023",
+    "adds": ["Ezekiel Elliott"],
+    "drops": ["Curtis Samuel"],
+    "roster_ids": [8],
+    "status_updated": "Sep 02, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 31, 2023",
+    "adds": ["Romeo Doubs"],
+    "drops": ["Michael Wilson"],
+    "roster_ids": [6],
+    "status_updated": "Sep 02, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Aug 31, 2023",
+    "adds": ["Devin Singletary"],
+    "drops": null,
+    "roster_ids": [6],
+    "status_updated": "Sep 02, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Sep 03, 2023",
+    "adds": ["Tyjae Spears"],
+    "drops": ["Chase Edmonds"],
+    "roster_ids": [6],
+    "status_updated": "Sep 03, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Sep 07, 2023",
+    "adds": ["Isaiah Likely"],
+    "drops": null,
+    "roster_ids": [1],
+    "status_updated": "Sep 07, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Sep 06, 2023",
+    "adds": ["Noah Gray"],
+    "drops": null,
+    "roster_ids": [8],
+    "status_updated": "Sep 07, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Sep 08, 2023",
+    "adds": ["Joshua Kelley"],
+    "drops": null,
+    "roster_ids": [6],
+    "status_updated": "Sep 09, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Sep 07, 2023",
+    "adds": ["Jake Ferguson"],
+    "drops": ["Zamir White"],
+    "roster_ids": [4],
+    "status_updated": "Sep 09, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Sep 09, 2023",
+    "adds": ["Joshua Dobbs"],
+    "drops": ["Wan'Dale Robinson"],
+    "roster_ids": [12],
+    "status_updated": "Sep 10, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Sep 10, 2023",
+    "adds": ["Seattle Seahawks"],
+    "drops": ["Pittsburgh Steelers"],
+    "roster_ids": [2],
+    "status_updated": "Sep 10, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Sep 10, 2023",
+    "adds": ["Sean Tucker"],
+    "drops": null,
+    "roster_ids": [1],
+    "status_updated": "Sep 10, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Sep 12, 2023",
+    "adds": null,
+    "drops": ["J.K. Dobbins"],
+    "roster_ids": [3],
+    "status_updated": "Sep 12, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Sep 12, 2023",
+    "adds": null,
+    "drops": ["Deon Jackson"],
+    "roster_ids": [1],
+    "status_updated": "Sep 12, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Sep 12, 2023",
+    "adds": null,
+    "drops": ["Aaron Rodgers"],
+    "roster_ids": [6],
+    "status_updated": "Sep 12, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Sep 13, 2023",
+    "adds": null,
+    "drops": ["Ty Chandler"],
+    "roster_ids": [7],
+    "status_updated": "Sep 13, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Sep 13, 2023",
+    "adds": ["Cleveland Browns"],
+    "drops": ["Washington Commanders"],
+    "roster_ids": [7],
+    "status_updated": "Sep 14, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Sep 12, 2023",
+    "adds": ["Sam LaPorta"],
+    "drops": ["Joshua Dobbs"],
+    "roster_ids": [12],
+    "status_updated": "Sep 14, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Sep 12, 2023",
+    "adds": ["Kendrick Bourne"],
+    "drops": ["Van Jefferson"],
+    "roster_ids": [3],
+    "status_updated": "Sep 14, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Sep 12, 2023",
+    "adds": ["Justice Hill"],
+    "drops": ["Greg Dulcich"],
+    "roster_ids": [8],
+    "status_updated": "Sep 14, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Sep 12, 2023",
+    "adds": ["Kyren Williams"],
+    "drops": null,
+    "roster_ids": [3],
+    "status_updated": "Sep 14, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Sep 12, 2023",
+    "adds": ["Rashid Shaheed"],
+    "drops": null,
+    "roster_ids": [5],
+    "status_updated": "Sep 14, 2023"
+  },
+  {
+    "status": "complete",
+    "created": "Sep 12, 2023",
+    "adds": ["Puka Nacua"],
+    "drops": ["Darius Slayton"],
+    "roster_ids": [1],
+    "status_updated": "Sep 14, 2023"
+  }
+]
