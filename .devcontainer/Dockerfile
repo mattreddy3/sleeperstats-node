@@ -22,4 +22,4 @@ ARG USERNAME=node
 # RUN su node -c "source /usr/local/share/nvm/nvm.sh && nvm install ${EXTRA_NODE_VERSION}"
 
 # [Optional] Uncomment if you want to install more global node packages
-RUN npm install -g typescript
+RUN npm install -g typescript @openai/codex
