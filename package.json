@@ -20,7 +20,7 @@
   "homepage": "https://github.com/mattreddy3/sleeperstats-node#readme",
   "devDependencies": {
     "@types/lodash": "^4.14.197",
-    "@types/node": "^16.18.46",
+    "@types/node": "^22.0.0",
     "typescript": "^5.2.2"
   },
   "dependencies": {

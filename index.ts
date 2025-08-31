@@ -72,6 +72,6 @@ const run = async () => {
   })
   csvWriter.writeRecords(csvData)
   console.log('run is done')
-  //   await LeagueUpcoming.downloadDraftData()
+  // await LeagueUpcoming.downloadDraftData()
 }
 run()

@@ -1,8 +1,8 @@
-import csv from "csv-parser"
-import fs from "fs"
-const createCsvWriter = require("csv-writer").createObjectCsvWriter
-import _ from "lodash"
-import { readFile } from "fs/promises"
+import csv from 'csv-parser'
+import fs from 'fs'
+const createCsvWriter = require('csv-writer').createObjectCsvWriter
+import _ from 'lodash'
+import { readFile } from 'fs/promises'
 const addComputedFields = (pick: any) => {
   let computedPick = {
     ...pick,
@@ -15,9 +15,9 @@ const addComputedFields = (pick: any) => {
 export default class League {
   public league_id: string
   public league_year: number
-  private _filesToRead = ["general", "passing", "scrimmage"]
-  private picksFileName = "picks"
-  private _apiBase = "https://api.sleeper.app/v1"
+  private _filesToRead = ['general', 'passing', 'scrimmage']
+  private picksFileName = 'picks'
+  private _apiBase = 'https://api.sleeper.app/v1'
   private _scoringSettings?: ScoringSettings
   private _league: null | {} = null
   private _rosters: null | any[] = null
@@ -30,7 +30,7 @@ export default class League {
     input_league_id?: string
     input_league_year?: number
   }) {
-    input_league_id ? (this.league_id = input_league_id) : (this.league_id = "")
+    input_league_id ? (this.league_id = input_league_id) : (this.league_id = '')
     input_league_year
       ? (this.league_year = input_league_year)
       : (this.league_year = 0)
@@ -43,7 +43,6 @@ export default class League {
       console.info(`League ${this.league_id} Already initialized`)
       return true
     }
-    this._playerRef = JSON.parse(await readFile("data/player-ref.json", "utf8"))
     let api_base = this._apiBase
     if (this.league_year && !this.league_id) {
       const leaguesResponse = await fetch(
@@ -68,8 +67,21 @@ export default class League {
       if (!this.league_year) {
         this.league_year = league.season
       }
-      this._scoringSettings = league["scoring_settings"]
+      this._scoringSettings = league['scoring_settings']
       this._league = league
+    }
+    // Load player reference data for the computed league year if available
+    try {
+      let playerRefPath = 'data/player-ref.json'
+      if (this.league_year) {
+        const yearSpecific = `data/player-ref_${this.league_year}.json`
+        if (fs.existsSync(yearSpecific)) {
+          playerRefPath = yearSpecific
+        }
+      }
+      this._playerRef = JSON.parse(await readFile(playerRefPath, 'utf8'))
+    } catch (e) {
+      throw `Failed to load player ref data for year ${this.league_year}: ${e}`
     }
     this.initialized = true
   }
@@ -90,7 +102,7 @@ export default class League {
     const users = await Promise.all(
       usersRes.filter((res) => res.ok).map((res) => res.json())
     )
-    const userMap = _.keyBy(users, "user_id")
+    const userMap = _.keyBy(users, 'user_id')
     rosters = rosters.map((r: any) => {
       let owner = r.owner_id
       let user = userMap[r.owner_id]
@@ -117,15 +129,15 @@ export default class League {
       return new Promise((resolve, reject) => {
         fs.createReadStream(`data/stats-${filePath}_${league_yr_temp}.csv`)
           .pipe(csv())
-          .on("data", (row: any) => {
+          .on('data', (row: any) => {
             if (allStats[row.key]) {
               allStats[row.key] = { ...allStats[row.key], [filePath]: row }
             } else {
               allStats[row.key] = { key: row.key, [filePath]: row }
             }
           })
-          .on("end", () => {
-            resolve(filePath + " done")
+          .on('end', () => {
+            resolve(filePath + ' done')
           })
       })
     })
@@ -138,7 +150,7 @@ export default class League {
   }
   private computePoints = async (allStats: Player[]) => {
     if (allStats) {
-      console.log("stats found")
+      console.log('stats found')
     }
     if (!this._scoringSettings) {
       throw `Scoring settings not found for league ${this.league_id} year ${this.league_year}`
@@ -146,80 +158,80 @@ export default class League {
     let scoringSettings = this._scoringSettings
     return Object.values(allStats).map((player: Player) => {
       if (player.general) {
-        let pointsPass = isNaN(player.general["Passing Yds"])
+        let pointsPass = isNaN(player.general['Passing Yds'])
           ? 0
           : this.round(
-              scoringSettings.pass_yd * player.general["Passing Yds"],
+              scoringSettings.pass_yd * player.general['Passing Yds'],
               1
             )
 
-        let pointsPassTD = isNaN(player.general["Passing TDs"])
+        let pointsPassTD = isNaN(player.general['Passing TDs'])
           ? 0
           : this.round(
-              scoringSettings.pass_td * player.general["Passing TDs"],
+              scoringSettings.pass_td * player.general['Passing TDs'],
               1
             )
-        let pointsRec = isNaN(player.general["Receiving Yds"])
+        let pointsRec = isNaN(player.general['Receiving Yds'])
           ? 0
           : this.round(
-              scoringSettings.rec_yd * player.general["Receiving Yds"],
+              scoringSettings.rec_yd * player.general['Receiving Yds'],
               1
             )
-        let pointsRush = isNaN(player.general["Rushing Yds"])
+        let pointsRush = isNaN(player.general['Rushing Yds'])
           ? 0
           : this.round(
-              scoringSettings.rush_yd * player.general["Rushing Yds"],
+              scoringSettings.rush_yd * player.general['Rushing Yds'],
               1
             )
-        let pointsRecTD = isNaN(player.general["Receiving TD"])
+        let pointsRecTD = isNaN(player.general['Receiving TD'])
           ? 0
           : this.round(
-              scoringSettings.rec_td * player.general["Receiving TD"],
+              scoringSettings.rec_td * player.general['Receiving TD'],
               1
             )
-        let pointsRushTD = isNaN(player.general["Rushing TD"])
+        let pointsRushTD = isNaN(player.general['Rushing TD'])
           ? 0
           : this.round(
-              scoringSettings.rush_td * player.general["Rushing TD"],
+              scoringSettings.rush_td * player.general['Rushing TD'],
               1
             )
         let pointsRushFD = 0,
           pointsRecFD = 0
         if (player.scrimmage) {
           //TODO
-          pointsRushFD = isNaN(player.general["Rushing 1D"])
+          pointsRushFD = isNaN(player.general['Rushing 1D'])
             ? 0
             : this.round(
-                scoringSettings.rush_fd * player.scrimmage["Rushing 1D"],
+                scoringSettings.rush_fd * player.scrimmage['Rushing 1D'],
                 1
               )
 
-          pointsRecFD = isNaN(player.general["Receiving 1D"])
+          pointsRecFD = isNaN(player.general['Receiving 1D'])
             ? 0
             : this.round(
-                scoringSettings.rec_fd * player.scrimmage["Receiving 1D"],
+                scoringSettings.rec_fd * player.scrimmage['Receiving 1D'],
                 1
               )
         }
         // LOL typo - "Passint Int" from PFR data
-        let pointsPassInt = isNaN(player.general["Passint Int"])
+        let pointsPassInt = isNaN(player.general['Passint Int'])
           ? 0
           : this.round(
-              scoringSettings.pass_int * player.general["Passint Int"],
+              scoringSettings.pass_int * player.general['Passint Int'],
               1
             )
-        let pointsFumL = isNaN(player.general["FL"])
+        let pointsFumL = isNaN(player.general['FL'])
           ? 0
-          : this.round(scoringSettings.fum_lost * player.general["FL"], 1)
+          : this.round(scoringSettings.fum_lost * player.general['FL'], 1)
 
         //WHERE???
-        let pointsPass2pt = isNaN(player.general["2PP"])
+        let pointsPass2pt = isNaN(player.general['2PP'])
           ? 0
-          : this.round(scoringSettings.pass_2pt * player.general["2PP"], 1)
-        let points2pt = isNaN(player.general["2PM"])
+          : this.round(scoringSettings.pass_2pt * player.general['2PP'], 1)
+        let points2pt = isNaN(player.general['2PM'])
           ? 0
           : //2pt plays are not tracked separately in pro football reference
-            this.round(scoringSettings.rush_2pt * player.general["2PM"], 1)
+            this.round(scoringSettings.rush_2pt * player.general['2PM'], 1)
 
         player.general.scoring = this.round(
           pointsRush +
@@ -255,18 +267,18 @@ export default class League {
       if (fs.existsSync(`${this.picksFileName}_${this.league_year}.csv`)) {
         fs.createReadStream(`${this.picksFileName}_${this.league_year}.csv`)
           .pipe(csv())
-          .on("data", (row: any) => data.push(row))
-          .on("end", () => {
+          .on('data', (row: any) => data.push(row))
+          .on('end', () => {
             resolve(data)
           })
-          .on("error", (err: any) => {
+          .on('error', (err: any) => {
             reject(err)
           })
-          .on("entry", (err: any) => {
+          .on('entry', (err: any) => {
             reject(err)
           })
       } else {
-        reject("not found")
+        reject('not found')
       }
     })
     let picks: any[]
@@ -281,7 +293,7 @@ export default class League {
         throw `what the hell bru ${draftsResponse.statusText}`
       }
       const drafts = await draftsResponse.json()
-      const draft_id = drafts[0]["draft_id"]
+      const draft_id = drafts[0]['draft_id']
       const picksResponse = await fetch(
         `${this._apiBase}/draft/${draft_id}/picks`
       )
@@ -290,25 +302,25 @@ export default class League {
       }
       picks = await picksResponse.json()
       let fieldMap = {
-        amount: "metadata.amount",
-        first_name: "metadata.first_name",
-        last_name: "metadata.last_name",
-        position: "metadata.position",
-        slot: "metadata.slot",
-        team: "metadata.team",
-        years_exp: "metadata.years_exp",
-        round: "round",
-        roster_id: "roster_id",
-        player_id: "player_id",
-        picked_by: "picked_by",
-        pick_no: "pick_no",
-        is_keeper: "is_keeper",
-        draft_slot: "draft_slot",
-        draft_id: "draft_id",
+        amount: 'metadata.amount',
+        first_name: 'metadata.first_name',
+        last_name: 'metadata.last_name',
+        position: 'metadata.position',
+        slot: 'metadata.slot',
+        team: 'metadata.team',
+        years_exp: 'metadata.years_exp',
+        round: 'round',
+        roster_id: 'roster_id',
+        player_id: 'player_id',
+        picked_by: 'picked_by',
+        pick_no: 'pick_no',
+        is_keeper: 'is_keeper',
+        draft_slot: 'draft_slot',
+        draft_id: 'draft_id',
       }
       let customHeaders = [
-        { id: "full_name", title: "FULL_NAME" },
-        { id: "keeper_cost", title: "KEEPER_COST" },
+        { id: 'full_name', title: 'FULL_NAME' },
+        { id: 'keeper_cost', title: 'KEEPER_COST' },
         // { id: "points_2022", title: "POINTS_2022" },
       ]
       let headers: { id: string; title: string }[] = Object.entries(fieldMap)
@@ -339,35 +351,35 @@ export default class League {
   }
   private combineData = async (picks: any[], stats: any[]) => {
     const playerNameMatcher = {
-      "DK Metcalf": "D.K. Metcalf",
-      "Mitch Trubisky": "Mitchell Trubisky",
-      "Michael Pittman": "Michael Pittman Jr.",
-      "Brian Robinson": "Brian Robinson Jr.",
-      "Gabe Davis": "Gabriel Davis",
-      "DJ Moore": "D.J. Moore",
-      "Kenneth Walker": "Kenneth Walker III",
-      "Joshua Palmer": "Josh Palmer",
-      "Ronald Jones": "Ronald Jones II",
+      'DK Metcalf': 'D.K. Metcalf',
+      'Mitch Trubisky': 'Mitchell Trubisky',
+      'Michael Pittman': 'Michael Pittman Jr.',
+      'Brian Robinson': 'Brian Robinson Jr.',
+      'Gabe Davis': 'Gabriel Davis',
+      'DJ Moore': 'D.J. Moore',
+      'Kenneth Walker': 'Kenneth Walker III',
+      'Joshua Palmer': 'Josh Palmer',
+      'Ronald Jones': 'Ronald Jones II',
     }
-    const pickMap = _.keyBy(picks, "FULL_NAME")
-    const statMap = _.keyBy(stats, "general.Player")
+    const pickMap = _.keyBy(picks, 'FULL_NAME')
+    const statMap = _.keyBy(stats, 'general.Player')
     for (const name in pickMap) {
       if (Object.prototype.hasOwnProperty.call(pickMap, name)) {
         let pickData = pickMap[name]
         let statData = statMap[name]
-        if (!statData && pickData.POSITION !== "DEF") {
+        if (!statData && pickData.POSITION !== 'DEF') {
           //@ts-ignore
           let matchName = playerNameMatcher[name]
           statData = statMap[matchName]
         }
-        pickData.POINTS_2022 = _.get(statData, "general.scoring")
-        pickData.POINTS_2022_AVG = _.get(statData, "general.scoring_avg")
+        pickData.POINTS_2022 = _.get(statData, 'general.scoring')
+        pickData.POINTS_2022_AVG = _.get(statData, 'general.scoring_avg')
         pickData.POINTS_PER_DOLLAR = this.round(
-          _.get(statData, "general.scoring") / pickData.AMOUNT,
+          _.get(statData, 'general.scoring') / pickData.AMOUNT,
           2
         )
         pickData.POINTS_AVG_PER_DOLLAR = this.round(
-          _.get(statData, "general.scoring_avg") / pickData.AMOUNT,
+          _.get(statData, 'general.scoring_avg') / pickData.AMOUNT,
           2
         )
         //TODO: OTHER POINTS? YARDS? STATS?
@@ -386,12 +398,12 @@ export default class League {
     const combinedStats = await this.computePoints(allStats)
     const allPicks = await this.getPicksData()
     const combinedData = await this.combineData(allPicks, combinedStats)
-    console.log("writing league", this.league_id)
+    console.log('writing league', this.league_id)
     if (Array.isArray(combinedData) && combinedData.length === 0) {
       console.warn(
-        "No data for league",
+        'No data for league',
         this.league_id,
-        "in year",
+        'in year',
         this.league_year
       )
       return
@@ -401,7 +413,7 @@ export default class League {
       header: Object.keys(combinedData[0]).map((id) => ({ id, title: id })),
     })
     csvWriter.writeRecords(combinedData)
-    console.log("done")
+    console.log('done')
   }
   downloadKeeperData = async (ops: { preseason?: boolean }) => {
     let keepers = await this.getKeepers(ops)
@@ -410,7 +422,7 @@ export default class League {
   private addPlayerData = async (ids: any[]): Promise<any[]> => {
     let playerRef = this._playerRef
     let that = this
-    return Promise.all(
+    const results = await Promise.all(
       ids.map(async (id) => {
         //@ts-ignore
         let ref = playerRef[id]
@@ -426,6 +438,7 @@ export default class League {
         }
       })
     )
+    return results
   }
   /**
    *
@@ -450,15 +463,15 @@ export default class League {
         let data: any[] = []
         fs.createReadStream(`data/keepers_final_${this.league_year}.csv`)
           .pipe(csv())
-          .on("data", (row: any) => {
+          .on('data', (row: any) => {
             // console.log(row)
             data.push(row)
           })
-          .on("end", () => {
+          .on('end', () => {
             console.log(`${this.league_year} keepers done`)
             resolve(data)
           })
-          .on("error", (err: any) => {
+          .on('error', (err: any) => {
             reject(err)
           })
       })
@@ -481,7 +494,7 @@ export default class League {
 
   private _getPlayerTransactionQuery = (player_id: string) => {
     return {
-      operationName: "league_transactions_by_player",
+      operationName: 'league_transactions_by_player',
       variables: {},
       query: `query league_transactions_by_player {
       league_transactions_by_player(league_id: "${this.league_id}", player_id: "${player_id}") {
@@ -507,44 +520,67 @@ export default class League {
     }
   }
   private _getPlayerTransactionHistory = async (player_id: string) => {
-    let res = await fetch("https://sleeper.com/graphql", {
+    // fetch('https://sleeper.com/graphql', {
+    //   headers: {
+    //     accept: 'application/json',
+    //     'accept-language': '',
+    //     authorization:
+    //       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdmF0YXIiOiI4MmFlYzhlODExYjgzOWI4ZWMyNWQ3YjQ1OGFmZDU3YiIsImRpc3BsYXlfbmFtZSI6Im1yZWRkeSIsImV4cCI6MTc4NzY5MDg3OSwiaXNfYm90IjpudWxsLCJpc19tYXN0ZXIiOm51bGwsInJlYWxfbmFtZSI6bnVsbCwidXNlcl9pZCI6ODU0OTc4NDM2Njg5NzAyOTEyfQ.rjw6y1JDejyqnwYk6nVReRHDy0eVJh_slayc6ygo3xw',
+    //     'content-type': 'application/json',
+    //     priority: 'u=1, i',
+    //     'sec-ch-ua':
+    //       '"Not;A=Brand";v="99", "Google Chrome";v="139", "Chromium";v="139"',
+    //     'sec-ch-ua-mobile': '?0',
+    //     'sec-ch-ua-platform': '"macOS"',
+    //     'sec-fetch-dest': 'empty',
+    //     'sec-fetch-mode': 'cors',
+    //     'sec-fetch-site': 'same-origin',
+    //     'x-sleeper-graphql-op': 'league_transactions_by_player',
+    //     cookie:
+    //       '__spdt=9895db9bc605444e9fa1356e314919ec; intercom-device-id-xstxtwfr=13f1e462-3569-43b1-9fda-89e5bf92de4b; _scid=hqr_miIcZEP1_bdpVZXvaoC_uxq5iLif; _tt_enable_cookie=1; _ttp=01K253W0TJMR7G6ZTKB1QE2QXC_.tt.1; FPC=e8862f91-4f75-4241-9991-1d2215646fe4; _ScCbts=%5B%5D; intercom-id-xstxtwfr=e35483cd-b0dd-43c6-967b-187ddf47efc2; _gid=GA1.2.185172308.1756580289; _clck=18xtbey%5E2%5Efyw%5E0%5E2046; OptanonConsent=isGpcEnabled=0&datestamp=Sat+Aug+30+2025+21%3A28%3A10+GMT%2B0200+(Central+European+Summer+Time)&version=202504.1.0&browserGpcFlag=0&isIABGlobal=false&hosts=&landingPath=NotLandingPage&groups=&geolocation=ES%3BMD&AwaitingReconsent=false; OptanonAlertBoxClosed=2025-08-30T19:28:10.111Z; _scid_r=mCr_miIcZEP1_bdpVZXvaoC_uxq5iLifEI38og; _ga=GA1.1.1899048302.1754665957; intercom-session-xstxtwfr=ek5qVzkxb1FYMUdoQjBmMllKWmJQbTB3cGg1RUxaNGRhYkhGUGsxTmxCNUliUGFQRFF1ZTRDYyttaGFPZFRtaDhHSXlYVDZoU0UxNUE4Y0J3cXBjUkdSdEw5RHp4NXRJaGU1OVBLbnpXeE09LS1USXNCWG5YM3pLYmRmNk5yMUN6UmR3PT0=--1d70c38c2fc3a5617c70417f7350a8c1a052ad85; _gat=1; _ga_1LF1E2KJ1W=GS2.1.s1756585427$o6$g0$t1756585427$j60$l0$h0; ttcsid_CLK9OK3C77UDPEGPB8N0=1756585427107::Dju9WxqdicK5RZFWgicD.5.1756585427107; ttcsid=1756585427108::yvShQ7eAAGGnUQrZIRXc.5.1756585427108; _clsk=1rn2s4s%5E1756585427595%5E1%5E1%5En.clarity.ms%2Fcollect; _ga_QEMDVZ8GRQ=GS2.1.s1756585428$o6$g0$t1756585428$j60$l0$h0',
+    //     Referer: 'https://sleeper.com/leagues/1257100117974974464/team',
+    //   },
+    //   body: '{"operationName":"league_transactions_by_player","variables":{},"query":"query league_transactions_by_player {\\n        league_transactions_by_player(league_id: \\"1257100117974974464\\",player_id: \\"8138\\"){\\n          adds\\n          consenter_ids\\n          created\\n          creator\\n          drops\\n          league_id\\n          leg\\n          metadata\\n          roster_ids\\n          settings\\n          status\\n          status_updated\\n          transaction_id\\n          draft_picks\\n          type\\n          player_map\\n          waiver_budget\\n        }\\n      }"}',
+    //   method: 'POST',
+    // })
+    let res = await fetch('https://sleeper.com/graphql', {
       headers: {
-        accept: "application/json",
-        "accept-language":
-          "en,en-US;q=0.9,ca;q=0.8,de;q=0.7,fr;q=0.6,nl;q=0.5,es;q=0.4",
+        accept: 'application/json',
+        'accept-language':
+          'en,en-US;q=0.9,ca;q=0.8,de;q=0.7,fr;q=0.6,nl;q=0.5,es;q=0.4',
         authorization:
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdmF0YXIiOiI4MmFlYzhlODExYjgzOWI4ZWMyNWQ3YjQ1OGFmZDU3YiIsImRpc3BsYXlfbmFtZSI6Im1yZWRkeSIsImV4cCI6MTc1NjAyMDExNSwiaXNfYm90IjpudWxsLCJpc19tYXN0ZXIiOm51bGwsInJlYWxfbmFtZSI6bnVsbCwidXNlcl9pZCI6ODU0OTc4NDM2Njg5NzAyOTEyfQ.f14miEoyDGJZdG4gvPpk8XU6tgWGpTZkOUUTywTYijM",
-        "content-type": "application/json",
-        priority: "u=1, i",
-        "sec-ch-ua":
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdmF0YXIiOiI4MmFlYzhlODExYjgzOWI4ZWMyNWQ3YjQ1OGFmZDU3YiIsImRpc3BsYXlfbmFtZSI6Im1yZWRkeSIsImV4cCI6MTc4NzY5MDg3OSwiaXNfYm90IjpudWxsLCJpc19tYXN0ZXIiOm51bGwsInJlYWxfbmFtZSI6bnVsbCwidXNlcl9pZCI6ODU0OTc4NDM2Njg5NzAyOTEyfQ.rjw6y1JDejyqnwYk6nVReRHDy0eVJh_slayc6ygo3xw',
+        'content-type': 'application/json',
+        priority: 'u=1, i',
+        'sec-ch-ua':
           '"Chromium";v="128", "Not;A=Brand";v="24", "Google Chrome";v="128"',
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": '"macOS"',
-        "sec-fetch-dest": "empty",
-        "sec-fetch-mode": "cors",
-        "sec-fetch-site": "same-origin",
-        "sec-gpc": "1",
-        "x-sleeper-graphql-op": "league_transactions_by_player",
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': '"macOS"',
+        'sec-fetch-dest': 'empty',
+        'sec-fetch-mode': 'cors',
+        'sec-fetch-site': 'same-origin',
+        'sec-gpc': '1',
+        'x-sleeper-graphql-op': 'league_transactions_by_player',
         cookie:
-          "__spdt=19caecc06cb84947925de63aaacab096; intercom-id-xstxtwfr=d92b1228-1ceb-4c58-a263-ef4780fc7bf5; intercom-device-id-xstxtwfr=264b9045-099c-46ba-8d36-03e356f4609b; OptanonAlertBoxClosed=2024-08-24T07:21:58.620Z; _ga=GA1.1.710020635.1724511692; _ga_D47X7ML72N=GS1.1.1724511692.1.1.1724511749.3.0.0; OptanonConsent=isGpcEnabled=1&datestamp=Sun+Aug+25+2024+11%3A54%3A29+GMT%2B0200+(Central+European+Summer+Time)&version=202404.1.0&browserGpcFlag=1&isIABGlobal=false&hosts=&landingPath=NotLandingPage&groups=C0003%3A0%2CC0001%3A1%2CC0002%3A0%2CC0004%3A0&geolocation=ES%3BMD&AwaitingReconsent=false; intercom-session-xstxtwfr=TEc3TFcrVDZsZXVSUWNXQUROSVY2YW0yN1hQZ3RkSllNb0g3alh0VUxBMVpYd3MzOHUwTjZQN1FWREgzNUNWeS0tWkNGc2VUMmNiUFY3RFQ2WlI0S2tyUT09--1ba80f1f7f64bc0ea22267a8a6c5b7ae4a55e974",
-        Referer: "https://sleeper.com/leagues/1124814687217676288/predraft",
-        "Referrer-Policy": "strict-origin-when-cross-origin",
+          '__spdt=19caecc06cb84947925de63aaacab096; intercom-id-xstxtwfr=d92b1228-1ceb-4c58-a263-ef4780fc7bf5; intercom-device-id-xstxtwfr=264b9045-099c-46ba-8d36-03e356f4609b; OptanonAlertBoxClosed=2024-08-24T07:21:58.620Z; _ga=GA1.1.710020635.1724511692; _ga_D47X7ML72N=GS1.1.1724511692.1.1.1724511749.3.0.0; OptanonConsent=isGpcEnabled=1&datestamp=Sun+Aug+25+2024+11%3A54%3A29+GMT%2B0200+(Central+European+Summer+Time)&version=202404.1.0&browserGpcFlag=1&isIABGlobal=false&hosts=&landingPath=NotLandingPage&groups=C0003%3A0%2CC0001%3A1%2CC0002%3A0%2CC0004%3A0&geolocation=ES%3BMD&AwaitingReconsent=false; intercom-session-xstxtwfr=TEc3TFcrVDZsZXVSUWNXQUROSVY2YW0yN1hQZ3RkSllNb0g3alh0VUxBMVpYd3MzOHUwTjZQN1FWREgzNUNWeS0tWkNGc2VUMmNiUFY3RFQ2WlI0S2tyUT09--1ba80f1f7f64bc0ea22267a8a6c5b7ae4a55e974',
+        Referer: 'https://sleeper.com/leagues/1124814687217676288/predraft',
+        'Referrer-Policy': 'strict-origin-when-cross-origin',
       },
       body: JSON.stringify(this._getPlayerTransactionQuery(player_id)),
-      method: "POST",
+      method: 'POST',
     })
     if (res.ok) {
       let data = await res.json()
       let returnData = data.data.league_transactions_by_player.map((t: any) => {
         return {
-          amount: _.get(t, "metadata.amount"), // 0 unless draft
-          trans_type: _.get(t, "type"),
-          timestamp: _.get(t, "status_updated"),
+          amount: _.get(t, 'metadata.amount'), // 0 unless draft
+          trans_type: _.get(t, 'type'),
+          timestamp: _.get(t, 'status_updated'),
           pre_trade_deadline:
-            new Date(_.get(t, "status_updated")) <
-            new Date("2023-11-21T00:00:00.000Z"),
+            new Date(_.get(t, 'status_updated')) <
+            new Date('2024-11-22T01:15:00Z'),
           action:
-            _.get(t, "adds") && _.get(t, `adds.${player_id}`) ? "add" : "drop",
+            _.get(t, 'adds') && _.get(t, `adds.${player_id}`) ? 'add' : 'drop',
         }
       })
       return returnData
