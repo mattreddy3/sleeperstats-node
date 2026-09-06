@@ -1,13 +1,13 @@
-const league_id_2022 = "854978776533184512" // 2022
-const league_id_2023 = "972782648546365440" // 2023
-const league_id_2024 = "1124814687217676288" // 2024
-
-const createCsvWriter = require("csv-writer").createObjectCsvWriter
-const last_year = 2023
-const upcoming_year = 2024
-import { get } from "lodash"
-import League from "./classes/League"
-import { getKeeperInc } from "./utils"
+const league_id_2022 = '854978776533184512' // 2022
+const league_id_2023 = '972782648546365440' // 2023
+const league_id_2024 = '1124814687217676288' // 2024
+const league_id_2025 = '1257100117974974464' // 2025
+const createCsvWriter = require('csv-writer').createObjectCsvWriter
+const last_year = 2024
+const upcoming_year = 2025
+import { get } from 'lodash'
+import League from './classes/League'
+import { getKeeperInc } from './utils'
 // const LeagueBlank = new League({})
 const run = async () => {
   const LeagueLast = new League({ input_league_year: last_year })
@@ -31,7 +31,7 @@ const run = async () => {
         return {}
       }
       // compute new keeper costs and years kept
-      let prevKeeper = prevKeepers.find((pk) => pk["﻿FULL_NAME"] === full_name)
+      let prevKeeper = prevKeepers.find((pk) => pk['﻿FULL_NAME'] === full_name)
       if (prevKeeper) {
         let prevCost = +prevKeeper.KEEPER_COST
         let prevYears = +prevKeeper.YEARS_KEPT_EXC
@@ -64,14 +64,14 @@ const run = async () => {
         years_kept: 0,
       }
     })
-    .filter((k) => "full_name" in k)
+    .filter((k) => 'full_name' in k)
   const header = Object.keys(csvData[0]).map((id) => ({ id, title: id }))
   const csvWriter = createCsvWriter({
     path: `keeper_costs.csv`,
     header,
   })
   csvWriter.writeRecords(csvData)
-  console.log("run is done")
-  //   await LeagueUpcoming.downloadDraftData()
+  console.log('run is done')
+  // await LeagueUpcoming.downloadDraftData()
 }
 run()
